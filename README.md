@@ -24,7 +24,7 @@ The solution is based around two components (microservices) - account service an
 
 ### Account Service
 
-Component responsible for:
+Component is responsible for:
 - ownership of time deposit products (entity `time_deposit_product`)
 - providing a list of available products
 - accepting and processing application for a specific product
@@ -49,8 +49,8 @@ Example:
 
 | id          | interest_rate | matures_on | count | available_count | denied_count | valid_from           | valid_until          |
 |-------------|---------------|------------|-------|-----------------|--------------|----------------------|----------------------|
-| _\<UUID\>_  | 6.25          | 2026-12-31 | 80    | 27              | 0            | 2024-08-01T09:00:00Z | 2024-09-01T09:00:00Z |
-| _\<UUID\>_  | 6.75          | 2025-12-31 | 50    | 0               | 143          | 2024-08-01T09:00:00Z | 2024-09-01T09:00:00Z |
+| _\<UUID\>_  | 6.25          | 2026-12-31 | 80    | 27              | 0            | 2024-07-01T09:00:00Z | 2024-09-01T09:00:00Z |
+| _\<UUID\>_  | 6.75          | 2025-12-31 | 50    | 0               | 143          | 2024-07-01T09:00:00Z | 2024-09-01T09:00:00Z |
 
 Notes:
 - Responsibilities of this component could perhaps be split among multiple components - depends on the broader context and the overall system design
@@ -60,7 +60,7 @@ Notes:
 
 ### Notification Service
 
-Responsible for:
+Component is responsible for:
 - processing requests to send push notification
 - integrating with a notification delivery system
 
@@ -77,7 +77,7 @@ Responsible for:
 
 ### List time deposits
 
-REST API endpoint `GET /time-deposits` for getting a list of time deposits. Returns all valid time deposit products including those no longer available (having `available_count <= 0`). Example:
+REST API endpoint `GET /time-deposits` served by account service for getting a list of time deposits. Returns all valid time deposit products including those no longer available (having `available_count <= 0`). Example:
 
 ```
 Request:
@@ -105,11 +105,11 @@ Response:
 ```
 
 Notes:
-- There is no need to pass exact `available_count` information to FE client - instead field `available` should be part of the response - it is `true` if `available_count > 0` else `false`.
+- There is no need to pass exact `available_count` information to FE client - instead field `available` can be part of the response - it is `true` if `available_count > 0` else `false`.
 
 ### Apply for time deposit 
 
-REST API endpoint `POST /time-deposits/{id}/application` for applying for a time deposit product with the given ID. Returns empty response. Example:
+REST API endpoint `POST /time-deposits/{id}/application` served by account service for applying for a time deposit product with the given ID. Returns empty response. Example:
 
 ```
 Request:
@@ -124,7 +124,7 @@ Notes:
 
 ### Open time deposit account
 
-Asynchronous command `OpenTimeDepositAccountCommand` for instructing the consumer to open a time deposit account. Message key should be `timeDepositId` to ensure FIFO message order (honoring one of the business requirements). Example:
+Asynchronous command `OpenTimeDepositAccountCommand` for instructing the consumer to open a time deposit account. Consumed by account service. Message key should be `timeDepositId` to ensure FIFO message order (honoring one of the business requirements). Example:
 
 ```
 Key: "a8ee09bf-731f-4b18-a378-ada3d2308be2"
@@ -136,7 +136,7 @@ Value: {
 
 ### Send notification
 
-Asynchronous command `SendNotificationCommand` for instructing the consumer to send a notification. Example:
+Asynchronous command `SendNotificationCommand` for instructing the consumer to send a notification. Consumed by notification service. Example:
 
 ```
 Key: null
@@ -146,7 +146,9 @@ Value: {
 )
 ```
 
-![alt text 1](tf-apply-for-time-deposit%20-%20UML%20sequence_%20User%20login%20overview.svg)
+### Business flow for applying for a time deposit account
+
+![alt text 1](tf-apply-for-time-deposit%20-%20sequence.svg)
 
 ## Observability
 
