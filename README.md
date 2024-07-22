@@ -25,7 +25,7 @@ The solution is based around two components (microservices) - account service an
 ### Account Service
 
 Component responsible for:
-- ownership of time deposit products
+- ownership of time deposit products (entity `time_deposit_product`)
 - providing a list of available products
 - accepting and processing application for a specific product
 - integrating with core banking system
@@ -41,15 +41,16 @@ Entity that represents time deposit product configuration.
 | matures_on      | Date      | Maturity date                                        |
 | count           | Integer   | Initial count; not updatable                         |
 | available_count | Integer   | Available count                                      |
+| denied_count    | Integer   | Denied application count                             |
 | valid_from      | Timestamp | Moment in time before which the product is not valid |
 | valid_until     | Timestamp | Moment in time after which the product is not valid  |
 
 Example:
 
-| id          | interest_rate | matures_on | count | available_count | valid_from          | valid_until         |
-|-------------|---------------|------------|-------|-----------------|---------------------|---------------------|
-| _\<UUID\>_  | 6.25          | 2026-12-31 | 80    | 27              | 2024-08-01T09:00:00 | 2024-09-01T09:00:00 |
-| _\<UUID\>_  | 6.75          | 2025-12-31 | 50    | 0               | 2024-08-01T09:00:00 | 2024-09-01T09:00:00 |
+| id          | interest_rate | matures_on | count | available_count | denied_count | valid_from           | valid_until          |
+|-------------|---------------|------------|-------|-----------------|--------------|----------------------|----------------------|
+| _\<UUID\>_  | 6.25          | 2026-12-31 | 80    | 27              | 0            | 2024-08-01T09:00:00Z | 2024-09-01T09:00:00Z |
+| _\<UUID\>_  | 6.75          | 2025-12-31 | 50    | 0               | 143          | 2024-08-01T09:00:00Z | 2024-09-01T09:00:00Z |
 
 Notes:
 - Responsibilities of this component could perhaps be split among multiple components - depends on the broader context and the overall system design
@@ -67,7 +68,7 @@ Responsible for:
 
 - Kafka (message broker)
 - Temporal (business workflows, idempotency)
-- Grafana (observability platform)
+- Grafana (observability dashboard)
 - Firebase (push notifications)
 
 ![alt text 0](tf-apply-for-time-deposit%20-%20Page%203.svg)
@@ -149,23 +150,23 @@ Value: {
 
 ## Observability
 
-Explain how metrics are pushed to Grafana - custom actuator metrics, micrometer, etc.
+As mentioned in the Components section, Grafana will be used as an observability platform. Micrometer and Prometheus can be used as an observability facade and metrics scraper respectively.
 
-Table of custom metrics
+Account service will expose custom metrics (per time deposit product) via actuator such as:
+- available count
+- denied application count
 
-TODO: processing time
-
-Live report can be generated from logs.
-
-Widget ideas:
-- available count simple display
-- available count burndown chart
-- kafka lag per partition
+Metrics will be visualized in Grafana. Some widget ideas include:
+- simple display of available count per product
+- burndown chart of available count per product
+- total applications per product
 - denied applications per product
-- time histogram of applications 
+- time histogram of applications
+- kafka lag per partition
+
+Additionally, a live report of sales can be visualised by filtering logs related to successful openings of time deposit accounts. Logs matching a certain pattern can be aggregated and provide number of account openings for a relative time period (e.g. last 15 minutes).
 
 # Open problems
 
-- How to configure time deposit plans - assumption is that for each week a new set of configurations is set up by business owner
 - Customer can apply multiple times for a single product (there is no business requirement prohibiting that)
-- One of the business requirement states that the account should be immediately available - this solution does not honor that
+- One of the business requirement states that the account should be _immediately_ available - this solution does not guarantee that
