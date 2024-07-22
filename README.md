@@ -70,6 +70,8 @@ Responsible for:
 - Grafana (observability platform)
 - Firebase (push notifications)
 
+![alt text 0](tf-apply-for-time-deposit%20-%20Page%203.svg)
+
 ## Communication
 
 ### List time deposits
@@ -142,6 +144,8 @@ Value: {
   "notificationType": "TIME_DEPOSIT_ACCOUNT_OPENED"
 )
 ```
+
+![alt text 1](tf-apply-for-time-deposit%20-%20UML%20sequence_%20User%20login%20overview.svg)
 
 ## Observability
 
