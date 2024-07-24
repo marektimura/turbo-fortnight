@@ -25,12 +25,12 @@ The solution is based around two components (microservices) - account service an
 ### Account Service
 
 Component is responsible for:
-- ownership of time deposit products (entity `time_deposit_product`)
+- ownership of time deposit products (entity `time_deposit`)
 - providing a list of available products
 - accepting and processing application for a specific product
 - integrating with core banking system
 
-#### Entity `time_deposit_product`
+#### Entity `time_deposit`
 
 Entity that represents time deposit product configuration.
 
@@ -55,8 +55,8 @@ Example:
 Notes:
 - Responsibilities of this component could perhaps be split among multiple components - depends on the broader context and the overall system design
 - Database would ideally have at least some read replicas to support the high load during the peak window 
-- `time_deposit_product.valid_from` allows to honor one of the business requirements
-- `time_deposit_product.valid_until` allows to avoid offering a product for a prolonged period of time
+- `time_deposit.valid_from` allows to honor one of the business requirements
+- `time_deposit.valid_until` allows to avoid offering a product for a prolonged period of time
 
 ### Notification Service
 
