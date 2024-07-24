@@ -71,7 +71,7 @@ Component is responsible for:
 - Grafana (observability dashboard)
 - Firebase (push notifications)
 
-![alt text 0](tf-apply-for-time-deposit%20-%20Page%203.svg)
+![alt text 0](tf-apply-for-time-deposit%20-%20component.svg)
 
 ## Communication
 
